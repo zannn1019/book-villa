@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+.swiper-slide {
+    transform: scale(0.9);
+    transition: transform 0.3s ease-in-out;
+}
+.swiper-slide-active {
+    transform: scale(1.1); /* Make center slide bigger */
+    z-index: 10;
+}
+.swiper {
+    overflow: visible !important;
+}
+.swiper-wrapper {
+    overflow: visible !important;
+}
