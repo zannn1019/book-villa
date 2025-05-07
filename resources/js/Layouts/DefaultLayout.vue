@@ -6,9 +6,15 @@
 
             <div class="w-full sm:max-w-sm flex items-center">
                 <input type="text" placeholder="Search villas..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                <button class="bg-green-600 text-white px-4 py-2 rounded-r-md hover:bg-green-700 transition">
-                    🔍
+                    class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    v-model="search" @keyup.enter="submitSearch" />
+                <button class="bg-green-600 text-white px-4 py-2 rounded-r-md hover:bg-green-700 transition"
+                    @click="submitSearch">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 4a7 7 0 100 14 7 7 0 000-14zm0 0l7 7" />
+                    </svg>
                 </button>
             </div>
             <div class="flex space-x-4" v-if="$page.props.auth.user == null">
@@ -26,6 +32,11 @@
                     class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2"
                     v-if="$page.props.auth.user.is_admin">
                 <span>Dashboard</span>
+                </Link>
+                <Link :href="'/bookings/' + $page.props.auth.user.id"
+                    class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2"
+                    v-if="$page.props.auth.user">
+                <span>Bookings</span>
                 </Link>
                 <button @click="logout"
                     class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2">
@@ -80,8 +91,17 @@
 
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue';
 
+const search = ref(null)
 const logout = () => {
     router.post(route('logout'));
 };
+
+const submitSearch = () => {
+    router.get('/', { search: search.value }, {
+        preserveState: true,
+        replace: true,
+    })
+}
 </script>

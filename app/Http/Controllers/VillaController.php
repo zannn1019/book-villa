@@ -12,10 +12,32 @@ class VillaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->query('search');
+
+        $villas = Villa::query()
+            ->when(
+                $search,
+                fn($query) =>
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+            )
+            ->limit(10)
+            ->get();
+
         return Inertia::render('Welcome', [
-            'villas' => Villa::limit(20)->get()
+            'villas' => $villas,
+            'filters' => [
+                'search' => $search,
+            ]
+        ]);
+    }
+
+    public function adminList()
+    {
+        return Inertia::render("Villa/index", [
+            'villas' => Villa::paginate(10)
         ]);
     }
 
@@ -24,7 +46,7 @@ class VillaController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Villa/Create');
     }
 
     /**
@@ -38,16 +60,12 @@ class VillaController extends Controller
             'price_per_night' => 'required|numeric',
             'location' => 'required',
             'capacity' => 'required|integer',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable',
         ]);
-
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('villas');
-        }
 
         Villa::create($data);
 
-        return redirect()->route('villas.index')->with('success', 'Villa added!');
+        return redirect()->route('villa.admin')->with('success', 'Villa added!');
     }
 
     public function search(Request $request)
@@ -79,17 +97,33 @@ class VillaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $villa = Villa::findOrFail($id);
+
+        return Inertia::render('Villa/Edit', [
+            'villa' => $villa
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $villa = Villa::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'price_per_night' => 'required|numeric',
+            'location' => 'required|string',
+            'capacity' => 'required|integer',
+        ]);
+
+        $villa->update($validated);
+
+        return redirect()->route('villa.admin')->with('success', 'Villa updated successfully.');
     }
 
     /**
@@ -97,6 +131,9 @@ class VillaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $villa = Villa::findOrFail($id);
+        $villa->delete();
+
+        return redirect()->route('villa.admin')->with('success', 'Villa deleted!');
     }
 }

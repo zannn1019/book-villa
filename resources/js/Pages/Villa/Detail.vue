@@ -57,10 +57,6 @@
                 class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow text-lg w-full sm:w-auto">
                 Book Now
             </button>
-            <button
-                class="border border-green-600 text-green-600 hover:bg-green-50 px-6 py-3 rounded-lg text-lg w-full sm:w-auto">
-                Contact Host
-            </button>
         </div>
     </div>
 </template>
